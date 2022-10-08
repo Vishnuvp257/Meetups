@@ -5,7 +5,7 @@ import MeetupList from "./../components/meetups/MeetupList";
 const DUMMY_LIST = [
   {
     id: "m1",
-    title: "First Meetup",
+    title: "MY First Meetup",
     image:
       "https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJlc3RhdXJhbnR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
     address: "some address",
@@ -21,8 +21,19 @@ const DUMMY_LIST = [
   },
 ];
 
-const HomePage = () => {
-  return <MeetupList meetups={DUMMY_LIST} />;
+const HomePage = (props) => {
+  return <MeetupList meetups={props.meetups} />;
 };
+
+export const getStaticProps = async () => {
+  return {
+    props: {
+      meetups: DUMMY_LIST,
+    },
+    revalidate: 10,
+  };
+};
+
+//export const getServerSideProps = async () => {};
 
 export default HomePage;
