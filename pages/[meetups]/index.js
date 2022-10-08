@@ -1,50 +1,59 @@
 import React from "react";
+import { MongoClient, ObjectId } from "mongodb";
 
 import MeetupDetails from "../../components/meetups/MeetupDetails";
 
-function MeetupDetail() {
+function MeetupDetail(props) {
   return (
     <MeetupDetails
-      image="https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJlc3RhdXJhbnR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
-      title="First meetup"
-      address="some address"
-      description="It was a fine day"
+      image={props.meetupData.image}
+      title={props.meetupData.title}
+      address={props.meetupData.address}
+      description={props.meetupData.description}
     />
   );
 }
 
 export const getStaticPaths = async () => {
+  const client = await MongoClient.connect(
+    "mongodb+srv://vishnuvp:wcCnquyZLSkti2el@cluster0.ix9ndo7.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+  const meetupIds = await meetupsCollection.find({}, { _id: 1 }).toArray();
   return {
-    paths: [
-      {
-        params: {
-          meetups: "m1",
-        },
-      },
-      {
-        params: {
-          meetups: "m2",
-        },
-      },
-    ],
+    paths: meetupIds.map((meetup) => ({
+      params: { meetups: meetup._id.toString() },
+    })),
     fallback: true,
   };
 };
 
 export const getStaticProps = async (context) => {
-  const meetups = context.params.meetups;
+  const meetupId = context.params.meetups;
+
+  const client = await MongoClient.connect(
+    "mongodb+srv://vishnuvp:wcCnquyZLSkti2el@cluster0.ix9ndo7.mongodb.net/meetups?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+  const meetupDetails = await meetupsCollection.findOne({
+    _id: ObjectId(meetupId),
+  });
 
   return {
     props: {
       meetupData: {
-        id: meetups,
-        image:
-          "https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHJlc3RhdXJhbnR8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60",
-        title: "First meetup",
-        address: "some address",
-        descriptionL: "It was a fine day",
+        id: meetupDetails._id.toString(),
+        title: meetupDetails.title,
+        address: meetupDetails.address,
+        image: meetupDetails.image,
+        description: meetupDetails.description,
       },
     },
+    revalidate: 1,
   };
 };
 
