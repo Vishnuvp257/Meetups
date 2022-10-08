@@ -1,5 +1,5 @@
 import React from "react";
-import { MongoClient } from "mongodb";
+import Head from "next/head";
 
 import { useRouter } from "next/router";
 
@@ -23,7 +23,18 @@ function NewMeetup(props) {
     router.push("/");
   };
 
-  return <NewMeetupForm onAddMeetup={addMeetupHandler} />;
+  return (
+    <>
+      <Head>
+        <title>Add a new Meetup</title>
+        <meta
+          name="description"
+          content="add your own meetups and create amazing network opportunites"
+        />
+      </Head>
+      <NewMeetupForm onAddMeetup={addMeetupHandler} />;
+    </>
+  );
 }
 
 export default NewMeetup;
