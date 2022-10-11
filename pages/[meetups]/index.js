@@ -21,23 +21,23 @@ function MeetupDetail(props) {
   );
 }
 
-export const getStaticPaths = async () => {
-  const client = await MongoClient.connect(
-    "mongodb+srv://vishnuvp:wcCnquyZLSkti2el@cluster0.ix9ndo7.mongodb.net/meetups?retryWrites=true&w=majority"
-  );
-  const db = client.db();
+// export const getStaticPaths = async () => {
+//   const client = await MongoClient.connect(
+//     "mongodb+srv://vishnuvp:wcCnquyZLSkti2el@cluster0.ix9ndo7.mongodb.net/meetups?retryWrites=true&w=majority"
+//   );
+//   const db = client.db();
 
-  const meetupsCollection = db.collection("meetups");
-  const meetupIds = await meetupsCollection.find({}, { _id: 1 }).toArray();
-  return {
-    paths: meetupIds.map((meetup) => ({
-      params: { meetups: meetup._id.toString() },
-    })),
-    fallback: "blocking",
-  };
-};
+//   const meetupsCollection = db.collection("meetups");
+//   const meetupIds = await meetupsCollection.find({}, { _id: 1 }).toArray();
+//   return {
+//     paths: meetupIds.map((meetup) => ({
+//       params: { meetups: meetup._id.toString() },
+//     })),
+//     fallback: "blocking",
+//   };
+// };
 
-export const getStaticProps = async (context) => {
+export const getServerSideProps = async (context) => {
   const meetupId = context.params.meetups;
 
   const client = await MongoClient.connect(
@@ -60,7 +60,6 @@ export const getStaticProps = async (context) => {
         description: meetupDetails.description,
       },
     },
-    revalidate: 1,
   };
 };
 
